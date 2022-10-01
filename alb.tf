@@ -50,9 +50,15 @@ resource "aws_lb" "alb" {
 #tg 
 resource "aws_lb_target_group" "http" {
   name     = "http"
-  port     = 80
+  port     = 8080
   protocol = "HTTP"
+  target_type = "instance"
   vpc_id   = "vpc-0603de69d0195f915"
+
+   stickiness {
+    type    = "lb_cookie"
+    enabled = true
+  }
 
   health_check {
     path                = "/54.254.194.167:8080/sparkjava-hello-world-17/hello"
@@ -61,7 +67,7 @@ resource "aws_lb_target_group" "http" {
     unhealthy_threshold = 2
     timeout             = 2
     interval            = 5
-    matcher             = "200" # has to be HTTP 200 or fails
+    #matcher             = "200" # has to be HTTP 200 or fails
   }
 }
 
@@ -79,6 +85,6 @@ resource "aws_lb_listener" "http" {
 
 resource "aws_lb_target_group_attachment" "http" {
   target_group_arn = aws_lb_target_group.http.arn
-  target_id        = aws_instance.tomcat.id
+  target_id        = "i-0d0a5e567628cf3e5"
   port             = 8080
 }
